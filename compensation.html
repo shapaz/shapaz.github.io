@@ -180,16 +180,28 @@
 
                 if (input.value && baseIdx > 0) {
                     const linkagePaid = mPrice * (currentIdx / baseIdx - 1);
-                    document.getElementById(`link-${mId}`).innerText = '₪' + Math.max(0, Math.round(linkagePaid)).toLocaleString();
-
-                    // חישוב החזר 60% (רק אם חוק חדש)
-                    let r60 = isNewLaw ? Math.max(0, linkagePaid * 0.6) : 0;
-                    
-                    // חישוב החזר איחור (אם תאריך תשלום > תאריך מסירה)
+                    let r60 = 0;
                     let rLate = 0;
-                    if (mDate > contractDeliv) {
-                        const linkageShouldBe = mPrice * (contractDelivIdx / baseIdx - 1);
-                        rLate = Math.max(0, linkagePaid - linkageShouldBe);
+                    
+                    if (isNewLaw) {
+                        if (mDate <= contractDeliv) {
+                            // Normal payment: Just return the 60% excess
+                            r60 = Math.max(0, linkagePaid * 0.6);
+                        } else {
+                            // Late payment: 
+                            // 1. Return 60% of the "legal" linkage (up to delivery date)
+                            const linkageAtDelivery = mPrice * (contractDelivIdx / baseIdx - 1);
+                            r60 = Math.max(0, linkageAtDelivery * 0.6);
+                            
+                            // 2. Return 100% of the "illegal" linkage (post delivery date)
+                            rLate = Math.max(0, linkagePaid - linkageAtDelivery);
+                        }
+                    } else {
+                        // Old Law: Only return the late index difference
+                        if (mDate > contractDeliv) {
+                            const linkageAtDelivery = mPrice * (contractDelivIdx / baseIdx - 1);
+                            rLate = Math.max(0, linkagePaid - linkageAtDelivery);
+                        }
                     }
 
                     document.getElementById(`ref60-${mId}`).innerText = '₪' + Math.round(r60).toLocaleString();

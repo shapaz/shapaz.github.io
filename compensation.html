@@ -3,27 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מחשבון פיצוי והצמדות - קבוצת דיירים</title>
+    <title>מחשבון פיצוי חוק המכר</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap');
         body { font-family: 'Assistant', sans-serif; background-color: #f8fafc; }
-        .input-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 2px; }
-        .milestone-card { border-right: 4px solid #3b82f6; transition: all 0.2s; }
-        .milestone-card:hover { background-color: #f1f5f9; }
+        .milestone-card { border-right: 4px solid #3b82f6; }
     </style>
 </head>
 <body class="p-4 bg-slate-50">
     <div class="max-w-2xl mx-auto">
-        <div class="text-center mb-6">
+        <header class="text-center mb-6">
             <h1 class="text-2xl font-bold text-slate-800">מחשבון פיצוי והחזרי הצמדה</h1>
-            <p class="text-slate-500 text-sm">חישוב מבוסס חוק המכר (תיקון 9) ומדדי דקל/למ"ס</p>
-        </div>
+            <p class="text-slate-500 text-sm italic">חישוב לפי תיקון 9 (יולי 2022) ומדדי תשומות הבנייה</p>
+        </header>
 
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6 border border-slate-200">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="col-span-2 md:col-span-1">
-                    <label class="block text-sm font-semibold mb-1">מחיר הדירה הכולל (₪)</label>
+                    <label class="block text-sm font-semibold mb-1">מחיר הדירה (₪)</label>
                     <input type="number" id="totalPrice" value="2500000" oninput="updateAll()" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div class="col-span-2 md:col-span-1">
@@ -31,54 +29,50 @@
                     <input type="number" id="rent" value="6500" oninput="updateAll()" class="w-full p-2 border rounded-lg">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold mb-1">תאריך חתימת חוזה</label>
+                    <label class="block text-sm font-semibold mb-1 text-xs">חתימת חוזה</label>
                     <input type="date" id="signDate" value="2022-08-01" oninput="updateAll()" class="w-full p-2 border rounded-lg">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold mb-1">מסירה חוזית (בחוזה)</label>
-                    <input type="date" id="contractDelivery" value="2024-01-01" oninput="updateAll()" class="w-full p-2 border rounded-lg">
+                    <label class="block text-sm font-semibold mb-1 text-xs text-blue-600">מועד מסירה חוזי</label>
+                    <input type="date" id="contractDelivery" value="2024-01-01" oninput="updateAll()" class="w-full p-2 border rounded-lg border-blue-200">
                 </div>
                 <div class="col-span-2">
-                    <label class="block text-sm font-semibold mb-1">מסירה צפויה/בפועל</label>
+                    <label class="block text-sm font-semibold mb-1">תאריך מסירה צפוי</label>
                     <input type="date" id="actualDelivery" value="2025-01-01" oninput="updateAll()" class="w-full p-2 border rounded-lg">
                 </div>
             </div>
-            <div id="lawBadge" class="mt-4 text-center py-1 rounded-full text-xs font-bold"></div>
+            <div id="lawBadge" class="mt-4 text-center py-1 rounded-full text-[11px] font-bold"></div>
         </div>
 
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6 border border-slate-200">
-            <h2 class="font-bold text-lg mb-4 text-slate-800 border-b pb-2">פירוט תשלומים והחזרי הצמדה</h2>
+            <h2 class="font-bold text-lg mb-4 text-slate-800 border-b pb-2">תשלומים לפי שלבים</h2>
             <div id="milestonesContainer" class="space-y-4">
                 </div>
         </div>
 
         <div class="bg-slate-900 rounded-2xl p-6 text-white shadow-xl sticky bottom-4">
-            <div class="grid grid-cols-1 gap-3">
-                <div class="flex justify-between items-center text-sm">
-                    <span class="opacity-80">פיצוי איחור (שכ"ד):</span>
-                    <span id="resComp" class="font-semibold">₪0</span>
+            <div class="grid grid-cols-1 gap-2 text-sm">
+                <div class="flex justify-between border-b border-slate-800 pb-2">
+                    <span class="opacity-70">פיצוי איחור (שכ"ד):</span>
+                    <span id="resComp" class="font-semibold text-blue-300">₪0</span>
                 </div>
-                <div class="flex justify-between items-center text-sm">
-                    <span class="opacity-80">החזר הצמדה לא חוקית (60%):</span>
-                    <span id="res60" class="font-semibold text-red-400">₪0</span>
+                <div class="flex justify-between border-b border-slate-800 pb-2">
+                    <span class="opacity-70">החזר 60% הצמדה (חוק חדש):</span>
+                    <span id="res60" class="font-semibold text-emerald-400">₪0</span>
                 </div>
-                <div class="flex justify-between items-center text-sm">
-                    <span class="opacity-80">הפרשי מדד לאחר מועד מסירה:</span>
-                    <span id="resLate" class="font-semibold text-red-400">₪0</span>
+                <div class="flex justify-between border-b border-slate-800 pb-2">
+                    <span class="opacity-70">החזר הצמדה עודפת (איחור):</span>
+                    <span id="resLate" class="font-semibold text-orange-400">₪0</span>
                 </div>
-                <div class="border-t border-slate-700 mt-2 pt-3 flex justify-between items-center">
-                    <span class="text-lg font-bold">סה"כ תביעה משוערת:</span>
+                <div class="pt-3 flex justify-between items-center">
+                    <span class="text-lg font-bold">סה"כ תביעה:</span>
                     <span id="resTotal" class="text-2xl font-black text-yellow-400">₪0</span>
                 </div>
             </div>
-            <button onclick="shareWhatsApp()" class="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2">
+            <button onclick="shareWhatsApp()" class="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2">
                 <span>שלח סיכום בוואטסאפ</span>
             </button>
         </div>
-        
-        <p class="text-[10px] text-center text-slate-400 mt-6">
-            * המחשבון מהווה כלי עזר בלבד. הנתונים מבוססים על מדד תשומות הבניה (בסיס 2011).
-        </p>
     </div>
 
     <script>
@@ -105,19 +99,27 @@
             const container = document.getElementById('milestonesContainer');
             milestones.forEach(m => {
                 const div = document.createElement('div');
-                div.className = 'milestone-card bg-slate-50 p-3 rounded-lg border border-slate-100';
+                div.className = 'milestone-card bg-slate-50 p-4 rounded-lg border border-slate-100 shadow-sm';
                 div.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="w-2/3">
-                            <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold">${m.pct}%</span>
-                            <h3 class="text-sm font-bold text-slate-700 leading-tight">${m.name}</h3>
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-1/2">
+                            <span class="text-[9px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">${m.pct}% מהמחיר</span>
+                            <h3 class="text-[13px] font-bold text-slate-800 mt-1">${m.name}</h3>
                         </div>
-                        <input type="date" class="m-date w-32 p-1 text-xs border rounded" data-id="${m.id}" oninput="updateAll()">
+                        <div class="text-left">
+                            <label class="text-[10px] text-slate-400 block uppercase">תאריך תשלום</label>
+                            <input type="date" class="m-date w-32 p-1 text-xs border rounded bg-white" data-id="${m.id}" oninput="updateAll()">
+                        </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2 text-[11px] text-slate-500">
-                        <div>סכום שלב: <span id="amt-${m.id}" class="text-slate-900 font-medium">₪0</span></div>
-                        <div>הצמדה: <span id="link-${m.id}" class="text-slate-900">₪0</span></div>
-                        <div class="text-red-600 font-bold">החזר: <span id="ref-${m.id}">₪0</span></div>
+                    <div class="grid grid-cols-2 gap-4 border-t border-slate-200 pt-2 text-[11px]">
+                        <div>
+                            <p class="text-slate-400">סכום השלב: <span id="amt-${m.id}" class="text-slate-900 font-bold">₪0</span></p>
+                            <p class="text-slate-400">הצמדה ששולמה: <span id="link-${m.id}" class="text-slate-700">₪0</span></p>
+                        </div>
+                        <div class="text-left bg-white p-1 rounded border border-blue-50">
+                            <p class="text-emerald-600 font-medium">החזר 60%: <span id="ref60-${m.id}">₪0</span></p>
+                            <p class="text-orange-600 font-medium">החזר איחור: <span id="refLate-${m.id}">₪0</span></p>
+                        </div>
                     </div>
                 `;
                 container.appendChild(div);
@@ -140,11 +142,10 @@
             const rent = parseFloat(document.getElementById('rent').value) || 0;
             const isNewLaw = signDate >= new Date('2022-07-07');
 
-            const badge = document.getElementById('lawBadge');
-            badge.innerText = isNewLaw ? "תנאי חוק המכר החדש (תיקון 9) חלים" : "תנאי חוק המכר הישן חלים";
-            badge.className = "mt-4 text-center py-1 rounded-full text-xs font-bold " + (isNewLaw ? "bg-green-100 text-green-700" : "bg-slate-200 text-slate-700");
+            document.getElementById('lawBadge').innerText = isNewLaw ? "חוק המכר החדש (תיקון 9) - הגבלת הצמדה ל-40%" : "חוק המכר הישן - אין הגבלת 60%";
+            document.getElementById('lawBadge').className = "mt-4 text-center py-1 rounded-full text-[11px] font-bold " + (isNewLaw ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-700");
 
-            // 1. Delay Comp (Logic from Amendment 9 text provided)
+            // 1. פיצוי שכ"ד (תיקון 9)
             let comp = 0;
             const diffDays = (actualDeliv - contractDeliv) / (1000 * 60 * 60 * 24);
             if (isNewLaw && diffDays > 30) {
@@ -162,9 +163,9 @@
                 }
             }
 
-            // 2. Linkage Auditing
-            let total60Refund = 0;
-            let totalLateRefund = 0;
+            // 2. חישוב הצמדות והחזרים לכל שלב
+            let globalRef60 = 0;
+            let globalRefLate = 0;
             const baseIdx = getIndex(signDate);
             const contractDelivIdx = getIndex(contractDeliv);
 
@@ -181,36 +182,38 @@
                     const linkagePaid = mPrice * (currentIdx / baseIdx - 1);
                     document.getElementById(`link-${mId}`).innerText = '₪' + Math.max(0, Math.round(linkagePaid)).toLocaleString();
 
-                    let refund = 0;
-                    if (isNewLaw) {
-                        refund += (linkagePaid * 0.6); // 60% Refund
-                    }
-                    if (mDate > contractDeliv) {
-                        const linkageShouldHaveBeen = mPrice * (contractDelivIdx / baseIdx - 1);
-                        refund += Math.max(0, linkagePaid - linkageShouldHaveBeen);
-                        if (mDate > contractDeliv) totalLateRefund += Math.max(0, linkagePaid - linkageShouldHaveBeen);
-                    }
+                    // חישוב החזר 60% (רק אם חוק חדש)
+                    let r60 = isNewLaw ? Math.max(0, linkagePaid * 0.6) : 0;
                     
-                    if (isNewLaw) total60Refund += (linkagePaid * 0.6);
-                    document.getElementById(`ref-${mId}`).innerText = '₪' + Math.round(refund).toLocaleString();
+                    // חישוב החזר איחור (אם תאריך תשלום > תאריך מסירה)
+                    let rLate = 0;
+                    if (mDate > contractDeliv) {
+                        const linkageShouldBe = mPrice * (contractDelivIdx / baseIdx - 1);
+                        rLate = Math.max(0, linkagePaid - linkageShouldBe);
+                    }
+
+                    document.getElementById(`ref60-${mId}`).innerText = '₪' + Math.round(r60).toLocaleString();
+                    document.getElementById(`refLate-${mId}`).innerText = '₪' + Math.round(rLate).toLocaleString();
+                    
+                    globalRef60 += r60;
+                    globalRefLate += rLate;
                 }
             });
 
             document.getElementById('resComp').innerText = '₪' + Math.round(comp).toLocaleString();
-            document.getElementById('res60').innerText = '₪' + Math.round(total60Refund).toLocaleString();
-            document.getElementById('resLate').innerText = '₪' + Math.round(totalLateRefund).toLocaleString();
-            document.getElementById('resTotal').innerText = '₪' + Math.round(comp + total60Refund + totalLateRefund).toLocaleString();
+            document.getElementById('res60').innerText = '₪' + Math.round(globalRef60).toLocaleString();
+            document.getElementById('resLate').innerText = '₪' + Math.round(globalRefLate).toLocaleString();
+            document.getElementById('resTotal').innerText = '₪' + Math.round(comp + globalRef60 + globalRefLate).toLocaleString();
         }
 
         function shareWhatsApp() {
-            const text = `*סיכום תביעה מוערך - איחור במסירה*\n\n` +
-                `💰 פיצוי שכ"ד: ${document.getElementById('resComp').innerText}\n` +
-                `📉 החזר מדד (60%): ${document.getElementById('res60').innerText}\n` +
-                `🏗️ הפרשי מדד באיחור: ${document.getElementById('resLate').innerText}\n\n` +
-                `*סה"כ דרישה מהקבלן: ${document.getElementById('resTotal').innerText}*`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+            const res = `*סיכום תביעת איחור במסירה*\n` +
+                        `🏠 פיצוי שכ"ד: ${document.getElementById('resComp').innerText}\n` +
+                        `📉 החזר 60% מדד: ${document.getElementById('res60').innerText}\n` +
+                        `🏗️ החזר הצמדה (איחור): ${document.getElementById('resLate').innerText}\n` +
+                        `*סה"כ דרישה: ${document.getElementById('resTotal').innerText}*`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(res)}`);
         }
-
         init();
     </script>
 </body>

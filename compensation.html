@@ -3,85 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מחשבון פיצוי חוק המכר - קבוצת דיירים</title>
+    <title>מחשבון פיצוי והצמדות - קבוצת דיירים</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&display=swap');
-        body { font-family: 'Assistant', sans-serif; background-color: #f0f2f5; color: #1c1e21; }
-        .card { background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 15px; }
-        input, select { border: 1px solid #ccd0d5; padding: 8px; border-radius: 6px; width: 100%; font-size: 14px; }
-        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 4px; color: #4b4f56; }
-        .milestone-row { display: grid; grid-template-cols: 1fr 1fr; gap: 10px; padding: 10px 0; border-bottom: 1px solid #eee; }
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap');
+        body { font-family: 'Assistant', sans-serif; background-color: #f8fafc; }
+        .input-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 2px; }
+        .milestone-card { border-right: 4px solid #3b82f6; transition: all 0.2s; }
+        .milestone-card:hover { background-color: #f1f5f9; }
     </style>
 </head>
-<body class="p-4">
-    <div class="max-w-xl mx-auto">
-        <header class="text-center mb-6">
-            <h1 class="text-2xl font-bold text-blue-800">מחשבון פיצוי והצמדה לדירה</h1>
-            <p class="text-sm text-gray-500">חישוב פרטי מקומי - המידע לא נשלח לאיש</p>
-        </header>
-
-        <div class="card">
-            <h2 class="font-bold border-b pb-2 mb-4 text-blue-900">נתוני חוזה כלליים</h2>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="col-span-2">
-                    <label>מחיר חוזי כולל (₪)</label>
-                    <input type="number" id="totalPrice" value="2500000" oninput="updateAll()">
-                </div>
-                <div class="col-span-2">
-                    <label>שכירות מוערכת לדירה דומה (₪)</label>
-                    <input type="number" id="rent" value="6500" oninput="updateAll()">
-                </div>
-                <div>
-                    <label>תאריך חתימה</label>
-                    <input type="date" id="signDate" value="2022-08-01" oninput="updateAll()">
-                </div>
-                <div>
-                    <label>מסירה חוזית</label>
-                    <input type="date" id="contractDelivery" value="2024-01-01" oninput="updateAll()">
-                </div>
-                <div class="col-span-2">
-                    <label>מסירה צפויה/בפועל</label>
-                    <input type="date" id="actualDelivery" value="2025-01-01" oninput="updateAll()">
-                </div>
-            </div>
-            <div id="lawStatus" class="mt-4 p-2 text-center text-xs font-bold rounded"></div>
+<body class="p-4 bg-slate-50">
+    <div class="max-w-2xl mx-auto">
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold text-slate-800">מחשבון פיצוי והחזרי הצמדה</h1>
+            <p class="text-slate-500 text-sm">חישוב מבוסס חוק המכר (תיקון 9) ומדדי דקל/למ"ס</p>
         </div>
 
-        <div class="card">
-            <h2 class="font-bold border-b pb-2 mb-2 text-blue-900">פירוט תשלומים לפי שלבים</h2>
-            <p class="text-[11px] text-gray-500 mb-4">בחר תאריך לכל שלב כדי לחשב הצמדה</p>
-            <div id="milestones"></div>
-        </div>
-
-        <div class="card bg-blue-900 text-white shadow-xl">
-            <h2 class="text-lg font-bold border-b border-blue-700 pb-2 mb-4">סיכום תביעה משוער</h2>
-            <div class="space-y-3 text-sm">
-                <div class="flex justify-between">
-                    <span>פיצוי איחור (שכ"ד):</span>
-                    <span id="resComp" class="font-bold">₪0</span>
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6 border border-slate-200">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-sm font-semibold mb-1">מחיר הדירה הכולל (₪)</label>
+                    <input type="number" id="totalPrice" value="2500000" oninput="updateAll()" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
                 </div>
-                <div class="flex justify-between">
-                    <span>החזר 60% מדד (תיקון 9):</span>
-                    <span id="res60" class="font-bold">₪0</span>
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-sm font-semibold mb-1">שכירות חודשית מוערכת (₪)</label>
+                    <input type="number" id="rent" value="6500" oninput="updateAll()" class="w-full p-2 border rounded-lg">
                 </div>
-                <div class="flex justify-between">
-                    <span>הפרשי מדד לאחר מסירה:</span>
-                    <span id="resLate" class="font-bold">₪0</span>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">תאריך חתימת חוזה</label>
+                    <input type="date" id="signDate" value="2022-08-01" oninput="updateAll()" class="w-full p-2 border rounded-lg">
                 </div>
-                <div class="flex justify-between text-xl pt-4 border-t border-blue-700 text-yellow-400 font-bold">
-                    <span>סה"כ תביעה:</span>
-                    <span id="resTotal">₪0</span>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">מסירה חוזית (בחוזה)</label>
+                    <input type="date" id="contractDelivery" value="2024-01-01" oninput="updateAll()" class="w-full p-2 border rounded-lg">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-semibold mb-1">מסירה צפויה/בפועל</label>
+                    <input type="date" id="actualDelivery" value="2025-01-01" oninput="updateAll()" class="w-full p-2 border rounded-lg">
                 </div>
             </div>
-            <button onclick="shareWhatsApp()" class="w-full mt-6 bg-green-500 py-3 rounded-lg font-bold text-white shadow-lg flex items-center justify-center gap-2">
+            <div id="lawBadge" class="mt-4 text-center py-1 rounded-full text-xs font-bold"></div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6 border border-slate-200">
+            <h2 class="font-bold text-lg mb-4 text-slate-800 border-b pb-2">פירוט תשלומים והחזרי הצמדה</h2>
+            <div id="milestonesContainer" class="space-y-4">
+                </div>
+        </div>
+
+        <div class="bg-slate-900 rounded-2xl p-6 text-white shadow-xl sticky bottom-4">
+            <div class="grid grid-cols-1 gap-3">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="opacity-80">פיצוי איחור (שכ"ד):</span>
+                    <span id="resComp" class="font-semibold">₪0</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="opacity-80">החזר הצמדה לא חוקית (60%):</span>
+                    <span id="res60" class="font-semibold text-red-400">₪0</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="opacity-80">הפרשי מדד לאחר מועד מסירה:</span>
+                    <span id="resLate" class="font-semibold text-red-400">₪0</span>
+                </div>
+                <div class="border-t border-slate-700 mt-2 pt-3 flex justify-between items-center">
+                    <span class="text-lg font-bold">סה"כ תביעה משוערת:</span>
+                    <span id="resTotal" class="text-2xl font-black text-yellow-400">₪0</span>
+                </div>
+            </div>
+            <button onclick="shareWhatsApp()" class="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2">
                 <span>שלח סיכום בוואטסאפ</span>
             </button>
         </div>
+        
+        <p class="text-[10px] text-center text-slate-400 mt-6">
+            * המחשבון מהווה כלי עזר בלבד. הנתונים מבוססים על מדד תשומות הבניה (בסיס 2011).
+        </p>
     </div>
 
     <script>
-        // נתוני מדד תשומות הבניה (בסיס יולי 2011 = 100)
         const indexData = {
             "2021-01": 115.1, "2021-02": 115.2, "2021-03": 115.7, "2021-04": 116.6, "2021-05": 117.5, "2021-06": 118.0, "2021-07": 118.5, "2021-08": 119.1, "2021-09": 119.2, "2021-10": 119.5, "2021-11": 119.7, "2021-12": 119.8,
             "2022-01": 120.9, "2022-02": 121.4, "2022-03": 122.9, "2022-04": 124.4, "2022-05": 125.1, "2022-06": 126.0, "2022-07": 126.8, "2022-08": 127.4, "2022-09": 127.4, "2022-10": 127.8, "2022-11": 127.5, "2022-12": 127.5,
@@ -91,109 +91,124 @@
         };
 
         const milestones = [
-            { name: "גמר יציקת רצפת מפלס תחתון", pct: 31 },
-            { name: "גמר שלד קומה (דירה ומטה)", pct: 25 },
-            { name: "גמר שלד בכל הבניין", pct: 5 },
-            { name: "גמר ציפוי חוץ", pct: 6 },
-            { name: "גמר טיח וריצוף בדירה", pct: 10 },
-            { name: "גמר חלונות ודלתות", pct: 13 },
-            { name: "גמר מערכות ופיתוח חצר", pct: 5 },
-            { name: "אישור אכלוס (טופס 4)", pct: 5 }
+            { id: 1, name: "גמר יציקת רצפת מפלס תחתון", pct: 31 },
+            { id: 2, name: "גמר שלד קומה (דירה ומטה)", pct: 25 },
+            { id: 3, name: "גמר שלד בכל הבניין", pct: 5 },
+            { id: 4, name: "גמר ציפוי חוץ", pct: 6 },
+            { id: 5, name: "גמר טיח וריצוף בדירה", pct: 10 },
+            { id: 6, name: "גמר חלונות ודלתות", pct: 13 },
+            { id: 7, name: "גמר מערכות ופיתוח חצר", pct: 5 },
+            { id: 8, name: "אישור אכלוס (טופס 4)", pct: 5 }
         ];
 
         function init() {
-            const list = document.getElementById('milestones');
-            milestones.forEach((m, i) => {
-                const row = document.createElement('div');
-                row.className = 'milestone-row';
-                row.innerHTML = `
-                    <div><div class="text-xs text-gray-400">${m.pct}%</div><div class="text-[12px] font-bold leading-tight">${m.name}</div></div>
-                    <input type="date" class="m-date" data-pct="${m.pct}" oninput="updateAll()">
+            const container = document.getElementById('milestonesContainer');
+            milestones.forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'milestone-card bg-slate-50 p-3 rounded-lg border border-slate-100';
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="w-2/3">
+                            <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold">${m.pct}%</span>
+                            <h3 class="text-sm font-bold text-slate-700 leading-tight">${m.name}</h3>
+                        </div>
+                        <input type="date" class="m-date w-32 p-1 text-xs border rounded" data-id="${m.id}" oninput="updateAll()">
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-[11px] text-slate-500">
+                        <div>סכום שלב: <span id="amt-${m.id}" class="text-slate-900 font-medium">₪0</span></div>
+                        <div>הצמדה: <span id="link-${m.id}" class="text-slate-900">₪0</span></div>
+                        <div class="text-red-600 font-bold">החזר: <span id="ref-${m.id}">₪0</span></div>
+                    </div>
                 `;
-                list.appendChild(row);
+                container.appendChild(div);
             });
             updateAll();
         }
 
-        function getIndexForDate(date) {
+        function getIndex(date) {
             if (!date) return 0;
             const d = new Date(date);
             const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-            return indexData[key] || 137.8; // חוזר למדד אחרון ידוע אם חסר
+            return indexData[key] || 137.8;
         }
 
         function updateAll() {
             const signDate = new Date(document.getElementById('signDate').value);
-            const delivDate = new Date(document.getElementById('contractDelivery').value);
-            const actualDate = new Date(document.getElementById('actualDelivery').value);
+            const contractDeliv = new Date(document.getElementById('contractDelivery').value);
+            const actualDeliv = new Date(document.getElementById('actualDelivery').value);
             const totalPrice = parseFloat(document.getElementById('totalPrice').value) || 0;
             const rent = parseFloat(document.getElementById('rent').value) || 0;
             const isNewLaw = signDate >= new Date('2022-07-07');
 
-            // 1. חוקיות
-            const status = document.getElementById('lawStatus');
-            status.innerText = isNewLaw ? "חוק המכר החדש (תיקון 9) - הגבלת הצמדה ל-40%" : "חוק המכר הישן";
-            status.className = "mt-4 p-2 text-center text-xs font-bold rounded " + (isNewLaw ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-700");
+            const badge = document.getElementById('lawBadge');
+            badge.innerText = isNewLaw ? "תנאי חוק המכר החדש (תיקון 9) חלים" : "תנאי חוק המכר הישן חלים";
+            badge.className = "mt-4 text-center py-1 rounded-full text-xs font-bold " + (isNewLaw ? "bg-green-100 text-green-700" : "bg-slate-200 text-slate-700");
 
-            // 2. פיצוי שכ"ד
+            // 1. Delay Comp (Logic from Amendment 9 text provided)
             let comp = 0;
-            const diffDays = (actualDate - delivDate) / (1000 * 60 * 60 * 24);
-            const diffMonths = diffDays / 30.44;
-
-            if (isNewLaw) {
-                if (diffDays > 30) {
-                    for (let m = 2; m <= diffMonths + 1; m++) {
-                        if (m <= 4) comp += rent;
-                        else if (m <= 10) comp += rent * 1.25;
-                        else comp += rent * 1.5;
-                    }
+            const diffDays = (actualDeliv - contractDeliv) / (1000 * 60 * 60 * 24);
+            if (isNewLaw && diffDays > 30) {
+                const mTotal = diffDays / 30.44;
+                for (let m = 2; m <= mTotal + 1; m++) {
+                    if (m <= 4) comp += rent;
+                    else if (m <= 10) comp += rent * 1.25;
+                    else comp += rent * 1.5;
                 }
-            } else {
-                if (diffDays > 60) {
-                    for (let m = 1; m <= diffMonths; m++) {
-                        if (m <= 8) comp += rent * 1.5;
-                        else comp += rent * 1.25;
-                    }
+            } else if (!isNewLaw && diffDays > 60) {
+                const mTotal = diffDays / 30.44;
+                for (let m = 1; m <= mTotal; m++) {
+                    if (m <= 8) comp += rent * 1.5;
+                    else comp += rent * 1.25;
                 }
             }
 
-            // 3. חישוב הצמדות
+            // 2. Linkage Auditing
             let total60Refund = 0;
-            let totalLateDiff = 0;
-            const baseIdx = getIndexForDate(signDate);
-            const delivIdx = getIndexForDate(delivDate);
+            let totalLateRefund = 0;
+            const baseIdx = getIndex(signDate);
+            const contractDelivIdx = getIndex(contractDeliv);
 
             document.querySelectorAll('.m-date').forEach(input => {
-                const pDate = new Date(input.value);
-                const pct = parseFloat(input.dataset.pct);
-                const amt = (totalPrice * pct) / 100;
-                const currentIdx = getIndexForDate(input.value);
+                const mId = input.dataset.id;
+                const mDate = new Date(input.value);
+                const pct = milestones.find(m => m.id == mId).pct;
+                const mPrice = (totalPrice * pct) / 100;
+                const currentIdx = getIndex(input.value);
 
-                if (input.value && currentIdx > 0 && baseIdx > 0) {
-                    const fullLinkage = amt * (currentIdx / baseIdx - 1);
-                    
-                    if (isNewLaw) total60Refund += (fullLinkage * 0.6);
-                    
-                    if (pDate > delivDate) {
-                        const linkageShouldHaveBeen = amt * (delivIdx / baseIdx - 1);
-                        totalLateDiff += (fullLinkage - linkageShouldHaveBeen);
+                document.getElementById(`amt-${mId}`).innerText = '₪' + Math.round(mPrice).toLocaleString();
+
+                if (input.value && baseIdx > 0) {
+                    const linkagePaid = mPrice * (currentIdx / baseIdx - 1);
+                    document.getElementById(`link-${mId}`).innerText = '₪' + Math.max(0, Math.round(linkagePaid)).toLocaleString();
+
+                    let refund = 0;
+                    if (isNewLaw) {
+                        refund += (linkagePaid * 0.6); // 60% Refund
                     }
+                    if (mDate > contractDeliv) {
+                        const linkageShouldHaveBeen = mPrice * (contractDelivIdx / baseIdx - 1);
+                        refund += Math.max(0, linkagePaid - linkageShouldHaveBeen);
+                        if (mDate > contractDeliv) totalLateRefund += Math.max(0, linkagePaid - linkageShouldHaveBeen);
+                    }
+                    
+                    if (isNewLaw) total60Refund += (linkagePaid * 0.6);
+                    document.getElementById(`ref-${mId}`).innerText = '₪' + Math.round(refund).toLocaleString();
                 }
             });
 
             document.getElementById('resComp').innerText = '₪' + Math.round(comp).toLocaleString();
             document.getElementById('res60').innerText = '₪' + Math.round(total60Refund).toLocaleString();
-            document.getElementById('resLate').innerText = '₪' + Math.round(totalLateDiff).toLocaleString();
-            document.getElementById('resTotal').innerText = '₪' + Math.round(comp + total60Refund + totalLateDiff).toLocaleString();
+            document.getElementById('resLate').innerText = '₪' + Math.round(totalLateRefund).toLocaleString();
+            document.getElementById('resTotal').innerText = '₪' + Math.round(comp + total60Refund + totalLateRefund).toLocaleString();
         }
 
         function shareWhatsApp() {
-            const res = `*סיכום תביעת דייר - איחור במסירה*\n\n` +
-                        `פיצוי שכ"ד: ${document.getElementById('resComp').innerText}\n` +
-                        `החזר 60% מדד (תיקון 9): ${document.getElementById('res60').innerText}\n` +
-                        `הפרשי מדד (איחור): ${document.getElementById('resLate').innerText}\n\n` +
-                        `*סה"כ דרישה: ${document.getElementById('resTotal').innerText}*`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(res)}`);
+            const text = `*סיכום תביעה מוערך - איחור במסירה*\n\n` +
+                `💰 פיצוי שכ"ד: ${document.getElementById('resComp').innerText}\n` +
+                `📉 החזר מדד (60%): ${document.getElementById('res60').innerText}\n` +
+                `🏗️ הפרשי מדד באיחור: ${document.getElementById('resLate').innerText}\n\n` +
+                `*סה"כ דרישה מהקבלן: ${document.getElementById('resTotal').innerText}*`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
         }
 
         init();

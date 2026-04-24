@@ -3,86 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מחשבון פיצוי חוק המכר - קבוצת דיירים</title>
+    <title>מחשבון פיצוי חוק המכר - מפורט</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap');
-        body { font-family: 'Assistant', sans-serif; background-color: #f8fafc; }
-        .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 1.5rem; margin-bottom: 1rem; }
-        input { border: 1px solid #cbd5e1; padding: 0.4rem; border-radius: 6px; width: 100%; font-size: 14px; }
-        .milestone-row { display: grid; grid-template-cols: 2fr 1fr 1.5fr 0.5fr; gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+        body { font-family: 'Assistant', sans-serif; background-color: #f1f5f9; }
+        .card { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); padding: 1.5rem; margin-bottom: 1rem; border: 1px solid #e2e8f0; }
+        input { border: 1px solid #cbd5e1; padding: 0.5rem; border-radius: 8px; width: 100%; font-size: 14px; background: #fff; }
+        .milestone-card { border-right: 4px solid #3b82f6; background: #ffffff; padding: 1rem; border-radius: 12px; margin-bottom: 0.75rem; border: 1px solid #e2e8f0; }
+        .summary-pill { background: #1e293b; color: white; padding: 1.5rem; border-radius: 20px; position: sticky; bottom: 1rem; z-index: 50; }
     </style>
 </head>
-<body class="p-4 pb-32">
+<body class="p-4 pb-40">
     <div class="max-w-2xl mx-auto">
-        <header class="text-center mb-6">
-            <h1 class="text-2xl font-bold text-slate-800">מחשבון פיצוי והצמדות - מותאם אישית</h1>
-            <p class="text-slate-500 text-sm italic">הנתונים נשמרים מקומית בדפדפן שלך</p>
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-slate-900">מחשבון פיצוי שכנים</h1>
+            <p class="text-slate-500 font-medium">פירוט מלא של הצמדות והחזרים לכל תשלום</p>
         </header>
 
-        <div class="card shadow-sm">
+        <div class="card">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="col-span-2">
                     <label class="block text-xs font-bold text-slate-500 mb-1">מחיר הדירה (₪)</label>
                     <input type="number" id="totalPrice" value="2500000" oninput="updateAll()">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1">שכירות חודשית (₪)</label>
-                    <input type="number" id="rent" value="6500" oninput="updateAll()">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1">תאריך חתימה</label>
-                    <input type="date" id="signDate" oninput="updateAll()">
-                </div>
-                <div>
                     <label class="block text-xs font-bold text-slate-500 mb-1 text-blue-600">מסירה חוזית</label>
                     <input type="date" id="contractDelivery" oninput="updateAll()">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1">מסירה בפועל (צפוי)</label>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">מסירה בפועל</label>
                     <input type="date" id="actualDelivery" oninput="updateAll()">
                 </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">שכירות חודשית (₪)</label>
+                    <input type="number" id="rent" value="6500" oninput="updateAll()">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">חתימת חוזה</label>
+                    <input type="date" id="signDate" oninput="updateAll()">
+                </div>
             </div>
-            <div id="lawBadge" class="mt-4 text-center py-1 rounded-full text-[11px] font-bold"></div>
+            <div id="lawBadge" class="mt-4 text-center py-1.5 rounded-full text-xs font-bold"></div>
         </div>
 
-        <div class="card shadow-sm">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="font-bold text-slate-800">לוח תשלומים והצמדות</h2>
-                <button onclick="addCustomRow()" class="text-blue-600 text-xs font-bold hover:underline">+ הוסף תשלום מותאם</button>
-            </div>
-            <div class="hidden md:grid grid-cols-4 gap-2 text-[10px] font-bold text-slate-400 mb-2 uppercase">
-                <div>תיאור שלב</div>
-                <div>% מהמחיר</div>
-                <div>תאריך תשלום</div>
-                <div></div>
-            </div>
-            <div id="milestoneList" class="space-y-1"></div>
-            <button onclick="resetMilestones()" class="mt-4 text-slate-400 text-[10px] underline">איפוס ללוח ברירת מחדל</button>
+        <div class="mb-4 flex justify-between items-end">
+            <h2 class="text-xl font-bold text-slate-800">פירוט תשלומים</h2>
+            <button onclick="addCustomRow()" class="text-blue-600 text-sm font-bold">+ הוסף תשלום</button>
+        </div>
+        
+        <div id="milestoneList" class="space-y-3"></div>
+
+        <div class="flex justify-center mt-4">
+            <button onclick="resetMilestones()" class="text-slate-400 text-xs underline">איפוס ללוח ברירת מחדל</button>
         </div>
 
-        <div class="bg-slate-900 rounded-2xl p-6 text-white shadow-xl fixed bottom-4 left-4 right-4 max-w-2xl mx-auto z-50">
-            <div class="grid grid-cols-1 gap-2 text-sm">
-                <div class="flex justify-between border-b border-slate-800 pb-2">
-                    <span class="opacity-70">פיצוי שכ"ד:</span>
-                    <span id="resComp" class="font-semibold text-blue-300">₪0</span>
-                </div>
-                <div class="flex justify-between border-b border-slate-800 pb-2">
-                    <span class="opacity-70">החזר 60% מדד:</span>
-                    <span id="res60" class="font-semibold text-emerald-400">₪0</span>
-                </div>
-                <div class="flex justify-between border-b border-slate-800 pb-2">
-                    <span class="opacity-70">החזר מדד איחור:</span>
-                    <span id="resLate" class="font-semibold text-orange-400">₪0</span>
-                </div>
-                <div class="pt-2 flex justify-between items-center">
-                    <span class="text-lg font-bold">סה"כ תביעה:</span>
-                    <span id="resTotal" class="text-2xl font-black text-yellow-400">₪0</span>
+        <div class="summary-pill shadow-2xl">
+            <div class="grid grid-cols-1 gap-2 text-sm mb-4">
+                <div class="flex justify-between opacity-80"><span>פיצוי שכ"ד:</span><span id="resComp">₪0</span></div>
+                <div class="flex justify-between opacity-80"><span>החזר הצמדה (60% + איחור):</span><span id="resLinkTotal">₪0</span></div>
+                <div class="flex justify-between text-xl font-black text-yellow-400 border-t border-slate-700 pt-2">
+                    <span>סה"כ תביעה:</span><span id="resTotal">₪0</span>
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-2 mt-4">
-                <button onclick="shareWhatsApp()" class="bg-green-600 text-white font-bold py-2 rounded-lg text-sm">WhatsApp</button>
-                <button onclick="clearStorage()" class="bg-slate-700 text-white font-bold py-2 rounded-lg text-sm">נקה הכל</button>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="shareWhatsApp()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-all">שיתוף בוואטסאפ</button>
+                <button onclick="clearStorage()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-xl transition-all text-xs">איפוס נתונים</button>
             </div>
         </div>
     </div>
@@ -97,23 +83,22 @@
         };
 
         const defaultMilestones = [
-            { name: "מקדמה", pct: 0, fixed: 10000 },
-            { name: "חתימת חוזה", pct: 7, fixed: -10000 },
-            { name: "גמר יציקת רצפה", pct: 24 }, // 31% minus the 7% above
-            { name: "גמר שלד קומה", pct: 25 },
-            { name: "גמר שלד בניין", pct: 5 },
-            { name: "גמר ציפוי חוץ", pct: 6 },
-            { name: "גמר טיח וריצוף", pct: 10 },
-            { name: "גמר חלונות ודלתות", pct: 13 },
-            { name: "גמר מערכות ופיתוח", pct: 5 },
-            { name: "אישור אכלוס (טופס 4)", pct: 5 }
+            { name: "מקדמה", pct: 0, amt: 10000 },
+            { name: "חתימת חוזה", pct: 0, amt: 0 }, // Will be set to 7% - 10k in init
+            { name: "גמר יציקת רצפה", pct: 24, amt: 0 },
+            { name: "גמר שלד קומה", pct: 25, amt: 0 },
+            { name: "גמר שלד בניין", pct: 5, amt: 0 },
+            { name: "גמר ציפוי חוץ", pct: 6, amt: 0 },
+            { name: "גמר טיח וריצוף", pct: 10, amt: 0 },
+            { name: "גמר חלונות ודלתות", pct: 13, amt: 0 },
+            { name: "גמר מערכות ופיתוח", pct: 5, amt: 0 },
+            { name: "אישור אכלוס (טופס 4)", pct: 5, amt: 0 }
         ];
 
         function init() {
-            // Load from LocalStorage or use defaults
-            const savedData = localStorage.getItem('neighborData');
-            if (savedData) {
-                const data = JSON.parse(savedData);
+            const saved = localStorage.getItem('neighborData_v2');
+            if (saved) {
+                const data = JSON.parse(saved);
                 document.getElementById('totalPrice').value = data.totalPrice;
                 document.getElementById('rent').value = data.rent;
                 document.getElementById('signDate').value = data.signDate;
@@ -121,6 +106,8 @@
                 document.getElementById('actualDelivery').value = data.actualDelivery;
                 renderMilestones(data.milestones);
             } else {
+                const price = 2500000;
+                defaultMilestones[1].amt = (price * 0.07) - 10000;
                 renderMilestones(defaultMilestones);
             }
             updateAll();
@@ -129,32 +116,53 @@
         function renderMilestones(list) {
             const container = document.getElementById('milestoneList');
             container.innerHTML = '';
-            list.forEach((m, i) => {
-                const row = document.createElement('div');
-                row.className = 'milestone-row';
-                row.innerHTML = `
-                    <input type="text" value="${m.name}" class="m-name font-bold text-slate-700 bg-transparent border-none">
-                    <input type="number" value="${m.pct || 0}" class="m-pct text-center" oninput="updateAll()">
-                    <input type="date" value="${m.date || ''}" class="m-date" oninput="updateAll()">
-                    <button onclick="this.parentElement.remove();updateAll()" class="text-red-300 hover:text-red-600 text-xs text-left">✕</button>
-                    <input type="hidden" class="m-fixed" value="${m.fixed || 0}">
-                `;
-                container.appendChild(row);
-            });
+            list.forEach((m, i) => addRowUI(m));
+        }
+
+        function addRowUI(data) {
+            const container = document.getElementById('milestoneList');
+            const row = document.createElement('div');
+            row.className = 'milestone-card';
+            row.innerHTML = `
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <input type="text" value="${data.name}" class="m-name font-bold text-slate-800 border-none p-0 focus:ring-0">
+                    <input type="date" value="${data.date || ''}" class="m-date text-xs font-bold text-blue-600 text-left border-none p-0" oninput="updateAll()">
+                </div>
+                <div class="grid grid-cols-2 gap-4 items-center">
+                    <div class="flex items-center gap-2">
+                        <input type="number" value="${data.pct}" class="m-pct w-16 text-center font-bold text-slate-600" oninput="syncFromPct(this)">
+                        <span class="text-xs text-slate-400">%</span>
+                        <input type="number" value="${data.amt}" class="m-amt font-bold" oninput="syncFromAmt(this)">
+                        <span class="text-xs text-slate-400">₪</span>
+                    </div>
+                    <div class="text-left">
+                         <button onclick="this.closest('.milestone-card').remove();updateAll()" class="text-red-300 hover:text-red-500 text-xs italic">מחיקה</button>
+                    </div>
+                </div>
+                <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between items-center text-[11px]">
+                    <div class="text-slate-500">הצמדה: <span class="m-link-paid font-bold text-slate-700">₪0</span></div>
+                    <div class="text-emerald-600 font-bold italic underline">החזר: <span class="m-refund-sum">₪0</span></div>
+                </div>
+            `;
+            container.appendChild(row);
+        }
+
+        function syncFromPct(el) {
+            const price = parseFloat(document.getElementById('totalPrice').value) || 0;
+            const amtInput = el.closest('.milestone-card').querySelector('.m-amt');
+            amtInput.value = Math.round(price * (el.value / 100));
+            updateAll();
+        }
+
+        function syncFromAmt(el) {
+            const price = parseFloat(document.getElementById('totalPrice').value) || 0;
+            const pctInput = el.closest('.milestone-card').querySelector('.m-pct');
+            pctInput.value = ((el.value / price) * 100).toFixed(2);
+            updateAll();
         }
 
         function addCustomRow() {
-            const container = document.getElementById('milestoneList');
-            const row = document.createElement('div');
-            row.className = 'milestone-row';
-            row.innerHTML = `
-                <input type="text" value="שלב חדש" class="m-name font-bold text-slate-700">
-                <input type="number" value="0" class="m-pct text-center" oninput="updateAll()">
-                <input type="date" class="m-date" oninput="updateAll()">
-                <button onclick="this.parentElement.remove();updateAll()" class="text-red-300 hover:text-red-600 text-xs">✕</button>
-                <input type="hidden" class="m-fixed" value="0">
-            `;
-            container.appendChild(row);
+            addRowUI({ name: "שלב חדש", pct: 0, amt: 0 });
             updateAll();
         }
 
@@ -169,81 +177,82 @@
             const signDate = new Date(document.getElementById('signDate').value);
             const contractDeliv = new Date(document.getElementById('contractDelivery').value);
             const actualDeliv = new Date(document.getElementById('actualDelivery').value);
-            const totalPrice = parseFloat(document.getElementById('totalPrice').value) || 0;
+            const price = parseFloat(document.getElementById('totalPrice').value) || 0;
             const rent = parseFloat(document.getElementById('rent').value) || 0;
             const isNewLaw = signDate >= new Date('2022-07-07');
 
             const badge = document.getElementById('lawBadge');
-            badge.innerText = isNewLaw ? "חוק חדש (תיקון 9)" : "חוק ישן (טרום יולי 2022)";
-            badge.className = "mt-4 text-center py-1 rounded-full text-[11px] font-bold " + (isNewLaw ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-700");
+            badge.innerText = isNewLaw ? "חוק חדש (תיקון 9) חל עליך" : "חוק ישן חל עליך";
+            badge.className = isNewLaw ? "mt-4 text-center py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700" : "mt-4 text-center py-1.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700";
 
-            // 1. Rent Compensation
-            let comp = 0;
+            // Rent Comp
+            let rentComp = 0;
             const diffDays = (actualDeliv - contractDeliv) / (1000 * 60 * 60 * 24);
             const mTotal = diffDays / 30.44;
             if (isNewLaw && diffDays > 30) {
                 for (let m = 2; m <= mTotal + 1; m++) {
-                    if (m <= 4) comp += rent; else if (m <= 10) comp += rent * 1.25; else comp += rent * 1.5;
+                    if (m <= 4) rentComp += rent; else if (m <= 10) rentComp += rent * 1.25; else rentComp += rent * 1.5;
                 }
             } else if (!isNewLaw && diffDays > 60) {
                 for (let m = 1; m <= mTotal; m++) {
-                    if (m <= 8) comp += rent * 1.5; else comp += rent * 1.25;
+                    if (m <= 8) rentComp += rent * 1.5; else rentComp += rent * 1.25;
                 }
             }
 
-            // 2. Linkage Auditing
-            let global60 = 0, globalLate = 0;
+            // Linkage & Refunds
+            let totalLinkRefund = 0;
             const baseIdx = getIndex(signDate);
-            const contractDelivIdx = getIndex(contractDeliv);
-            const currentMilestones = [];
+            const delivIdx = getIndex(contractDeliv);
+            const milestones = [];
 
-            document.querySelectorAll('.milestone-row').forEach(row => {
-                const name = row.querySelector('.m-name').value;
-                const pct = parseFloat(row.querySelector('.m-pct').value) || 0;
-                const date = row.querySelector('.m-date').value;
-                const fixed = parseFloat(row.querySelector('.m-fixed').value) || 0;
+            document.querySelectorAll('.milestone-card').forEach(card => {
+                const name = card.querySelector('.m-name').value;
+                const pct = card.querySelector('.m-pct').value;
+                const amt = parseFloat(card.querySelector('.m-amt').value) || 0;
+                const dateVal = card.querySelector('.m-date').value;
+                const payDate = new Date(dateVal);
                 
-                currentMilestones.push({ name, pct, date, fixed });
+                milestones.push({ name, pct, amt, date: dateVal });
 
-                if (date && baseIdx > 0) {
-                    const mAmount = (totalPrice * pct / 100) + fixed;
-                    const pIdx = getIndex(date);
-                    const linkagePaid = mAmount * (pIdx / baseIdx - 1);
+                if (dateVal && baseIdx > 0) {
+                    const currentIdx = getIndex(dateVal);
+                    const linkPaid = amt * (currentIdx / baseIdx - 1);
+                    card.querySelector('.m-link-paid').innerText = '₪' + Math.max(0, Math.round(linkPaid)).toLocaleString();
 
+                    let refund = 0;
                     if (isNewLaw) {
-                        if (new Date(date) <= contractDeliv) {
-                            global60 += Math.max(0, linkagePaid * 0.6);
+                        if (payDate <= contractDeliv) {
+                            refund = linkPaid * 0.6;
                         } else {
-                            const linkageAtDeliv = mAmount * (contractDelivIdx / baseIdx - 1);
-                            global60 += Math.max(0, linkageAtDeliv * 0.6);
-                            globalLate += Math.max(0, linkagePaid - linkageAtDeliv);
+                            const linkAtDeliv = amt * (delivIdx / baseIdx - 1);
+                            refund = (linkAtDeliv * 0.6) + (linkPaid - linkAtDeliv);
                         }
-                    } else if (new Date(date) > contractDeliv) {
-                        const linkageAtDeliv = mAmount * (contractDelivIdx / baseIdx - 1);
-                        globalLate += Math.max(0, linkagePaid - linkageAtDeliv);
+                    } else if (payDate > contractDeliv) {
+                        const linkAtDeliv = amt * (delivIdx / baseIdx - 1);
+                        refund = linkPaid - linkAtDeliv;
                     }
+                    
+                    card.querySelector('.m-refund-sum').innerText = '₪' + Math.max(0, Math.round(refund)).toLocaleString();
+                    totalLinkRefund += Math.max(0, refund);
                 }
             });
 
-            // Update UI
-            document.getElementById('resComp').innerText = '₪' + Math.round(comp).toLocaleString();
-            document.getElementById('res60').innerText = '₪' + Math.round(global60).toLocaleString();
-            document.getElementById('resLate').innerText = '₪' + Math.round(globalLate).toLocaleString();
-            document.getElementById('resTotal').innerText = '₪' + Math.round(comp + global60 + globalLate).toLocaleString();
+            document.getElementById('resComp').innerText = '₪' + Math.round(rentComp).toLocaleString();
+            document.getElementById('resLinkTotal').innerText = '₪' + Math.round(totalLinkRefund).toLocaleString();
+            document.getElementById('resTotal').innerText = '₪' + Math.round(rentComp + totalLinkRefund).toLocaleString();
 
-            // Save to LocalStorage
-            localStorage.setItem('neighborData', JSON.stringify({
-                totalPrice, rent, signDate: document.getElementById('signDate').value,
+            localStorage.setItem('neighborData_v2', JSON.stringify({
+                totalPrice: price, rent, signDate: document.getElementById('signDate').value,
                 contractDelivery: document.getElementById('contractDelivery').value,
                 actualDelivery: document.getElementById('actualDelivery').value,
-                milestones: currentMilestones
+                milestones
             }));
         }
 
-        function resetMilestones() { renderMilestones(defaultMilestones); updateAll(); }
-        function clearStorage() { localStorage.removeItem('neighborData'); location.reload(); }
+        function resetMilestones() { localStorage.removeItem('neighborData_v2'); location.reload(); }
+        function clearStorage() { if(confirm("למחוק הכל?")) { localStorage.removeItem('neighborData_v2'); location.reload(); } }
         function shareWhatsApp() {
-            const msg = `*סיכום תביעת איחור במסירה*\n💰 פיצוי שכ"ד: ${document.getElementById('resComp').innerText}\n📉 החזר 60% מדד: ${document.getElementById('res60').innerText}\n🏗️ החזר מדד איחור: ${document.getElementById('resLate').innerText}\n*סה"כ דרישה: ${document.getElementById('resTotal').innerText}*`;
+            const msg = `*סיכום תביעת דייר*\n🏘️ פיצוי שכ"ד: ${document.getElementById('resComp').innerText}\n📉 החזר הצמדות: ${document.getElementById('resLinkTotal').innerText}\n*💰 סה"כ דרישה: ${document.getElementById('resTotal').innerText}*`;
             window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
         }
 

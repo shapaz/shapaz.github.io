@@ -3,81 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מחשבון פיצוי חוק המכר</title>
+    <title>מחשבון פיצוי והצמדה - חוק המכר</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap');
-        body { font-family: 'Assistant', sans-serif; background-color: #f8fafc; }
-        input, select { border: 1px solid #cbd5e1 !important; padding: 0.6rem; border-radius: 8px; width: 100%; font-size: 16px; background: #fff; }
-        .milestone-card { border-right: 5px solid #3b82f6; background: #ffffff; padding: 1rem; border-radius: 12px; margin-bottom: 1rem; border: 1px solid #e2e8f0; position: relative; }
-        .del-btn { position: absolute; left: 12px; top: 12px; color: #ef4444; font-size: 20px; line-height: 1; cursor: pointer; }
-        .summary-panel { background: #1e293b; color: white; padding: 1.25rem; border-radius: 20px 20px 0 0; position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); }
+        body { font-family: 'Assistant', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        
+        /* נקיון שדות בתוך הטבלה */
+        .clean-input { border: none !important; background: transparent !important; outline: none !important; box-shadow: none !important; padding: 4px 0 !important; }
+        .date-input { border: 1px solid #cbd5e1 !important; border-radius: 8px; padding: 6px 10px !important; background: #fff !important; font-size: 14px; }
+        
+        /* שדות עליונים */
+        .top-input { border: 1px solid #cbd5e1; border-radius: 10px; padding: 10px; width: 100%; background: #fff; }
+
+        /* כרטיס תשלום */
+        .milestone-card { border-bottom: 1px solid #e2e8f0; padding: 16px 0; position: relative; }
+        .del-btn { color: #fca5a5; font-size: 22px; cursor: pointer; transition: color 0.2s; position: absolute; left: 0; top: 16px; }
+        .del-btn:hover { color: #ef4444; }
+
+        /* פאנל סיכום צף */
+        .summary-panel { background: #0f172a; color: white; border-radius: 24px 24px 0 0; position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; box-shadow: 0 -10px 25px rgba(0,0,0,0.2); }
+        
+        /* הסרת חיצי מספרים */
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
     </style>
 </head>
-<body class="p-4 pb-60">
+<body class="p-4 pb-72">
     <div class="max-w-2xl mx-auto">
-        <header class="text-center mb-6">
-            <h1 class="text-3xl font-extrabold text-slate-900">מחשבון פיצוי דיירים</h1>
+        <header class="text-center mb-10">
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">מחשבון פיצוי שכנים</h1>
             <p class="text-slate-500 font-medium italic">בדיקת הצמדות ופיצוי איחור במסירה</p>
         </header>
 
-        <div class="bg-white rounded-2xl shadow-sm p-6 mb-6 border border-slate-200">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-bold text-slate-500 mb-1">מחיר הדירה הכולל (₪)</label>
-                    <input type="number" id="totalPrice" value="2500000" oninput="updateAllPriceSync()">
+        <!-- נתוני בסיס -->
+        <div class="bg-white rounded-3xl shadow-sm p-6 mb-8 border border-slate-200">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label class="block text-xs font-bold text-slate-400 mb-1 mr-1">מחיר הדירה הכולל (₪)</label>
+                    <input type="number" id="totalPrice" value="2500000" oninput="syncAllPrices()" class="text-2xl font-black border-b-2 border-slate-100 focus:border-blue-500 outline-none w-full py-2 tracking-tight">
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1">שכירות חודשית מוערכת (₪)</label>
-                    <input type="number" id="rent" value="6500" oninput="updateAll()">
+                <div class="col-span-2 sm:col-span-1">
+                    <label class="block text-xs font-bold text-slate-400 mb-1 mr-1">שכירות חודשית (₪)</label>
+                    <input type="number" id="rent" value="6500" oninput="updateAll()" class="top-input font-bold">
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1">תאריך חתימת חוזה</label>
-                    <input type="date" id="signDate" value="2022-08-01" oninput="updateAll()">
+                <div class="col-span-2 sm:col-span-1">
+                    <label class="block text-xs font-bold text-slate-400 mb-1 mr-1">תאריך חתימת חוזה</label>
+                    <input type="date" id="signDate" value="2022-08-01" oninput="updateAll()" class="top-input">
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-blue-600 mb-1">מועד מסירה חוזי</label>
-                    <input type="date" id="contractDelivery" value="2024-01-01" oninput="updateAll()">
+                <div class="col-span-1">
+                    <label class="block text-xs font-bold text-blue-500 mb-1 mr-1">מסירה חוזית</label>
+                    <input type="date" id="contractDelivery" value="2024-01-01" oninput="updateAll()" class="top-input border-blue-200">
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1">תאריך מסירה בפועל</label>
-                    <input type="date" id="actualDelivery" value="2025-01-01" oninput="updateAll()">
+                <div class="col-span-1">
+                    <label class="block text-xs font-bold text-red-400 mb-1 mr-1">מסירה בפועל</label>
+                    <input type="date" id="actualDelivery" value="2025-01-01" oninput="updateAll()" class="top-input border-red-100">
                 </div>
             </div>
-            <div id="lawBadge" class="mt-4 text-center py-2 rounded-xl text-xs font-bold uppercase tracking-wider"></div>
+            <div id="lawBadge" class="mt-6 text-center py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-slate-50 text-slate-400"></div>
         </div>
 
-        <div class="mb-4 flex justify-between items-center px-1">
+        <!-- לוח תשלומים -->
+        <div class="flex justify-between items-center mb-4 px-2">
             <h2 class="text-xl font-bold text-slate-800">פירוט תשלומים</h2>
-            <button onclick="addCustomRow()" class="text-blue-600 text-sm font-bold bg-blue-50 px-3 py-1 rounded-lg hover:bg-blue-100 transition-colors">+ הוסף תשלום</button>
+            <button onclick="addCustomRow()" class="text-blue-600 text-sm font-bold bg-blue-50 px-4 py-1.5 rounded-full hover:bg-blue-100 transition-all">+ הוסף תשלום</button>
         </div>
         
-        <div id="milestoneList" class="space-y-3"></div>
-
-        <div class="text-center mt-6">
-            <button onclick="resetMilestones()" class="text-slate-400 text-xs underline decoration-dotted">איפוס ללוח ברירת מחדל</button>
+        <div id="milestoneList" class="bg-white rounded-3xl shadow-sm p-6 border border-slate-200 min-h-[100px]">
+            <!-- Content Injected Here -->
         </div>
 
+        <div class="text-center mt-8">
+            <button onclick="resetMilestones()" class="text-slate-400 text-xs underline decoration-dotted opacity-60 hover:opacity-100">איפוס ללוח ברירת מחדל</button>
+        </div>
+
+        <!-- פאנל סיכום צף -->
         <div class="summary-panel">
-            <div class="max-w-2xl mx-auto space-y-2">
-                <div class="flex justify-between text-sm opacity-80">
-                    <span>פיצוי שכ"ד:</span>
-                    <span id="resComp">₪0</span>
+            <div class="max-w-2xl mx-auto p-6">
+                <div class="grid grid-cols-1 gap-2.5 text-sm">
+                    <div class="flex justify-between items-center opacity-70">
+                        <span>פיצוי שכ"ד:</span>
+                        <span id="resComp" class="font-bold">₪0</span>
+                    </div>
+                    <div class="flex justify-between items-center text-emerald-400">
+                        <span>החזר 60% (חוק חדש):</span>
+                        <span id="res60Total" class="font-bold">₪0</span>
+                    </div>
+                    <div class="flex justify-between items-center text-orange-400">
+                        <span>החזר הצמדה (איחור):</span>
+                        <span id="resLateTotal" class="font-bold">₪0</span>
+                    </div>
+                    <div class="flex justify-between items-center text-3xl font-black text-yellow-400 pt-4 mt-2 border-t border-slate-800">
+                        <span>סה"כ דרישה:</span>
+                        <span id="resTotal">₪0</span>
+                    </div>
                 </div>
-                <div class="flex justify-between text-sm text-emerald-400">
-                    <span>החזר 60% (חוק חדש):</span>
-                    <span id="res60Total">₪0</span>
-                </div>
-                <div class="flex justify-between text-sm text-orange-400">
-                    <span>החזר הצמדה (איחור):</span>
-                    <span id="resLateTotal">₪0</span>
-                </div>
-                <div class="flex justify-between text-2xl font-black text-yellow-400 pt-2 border-t border-slate-700">
-                    <span>סה"כ תביעה:</span>
-                    <span id="resTotal">₪0</span>
-                </div>
-                <button onclick="shareWhatsApp()" class="w-full mt-3 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2">
-                    שתף ב-WhatsApp
+                <button onclick="shareWhatsApp()" class="w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl transition-all shadow-xl flex items-center justify-center gap-2">
+                    שתף סיכום ב-WhatsApp
                 </button>
             </div>
         </div>
@@ -103,11 +125,11 @@
             { name: "גמר טיח וריצוף", pct: 10, amt: 0 },
             { name: "גמר חלונות ודלתות", pct: 13, amt: 0 },
             { name: "גמר מערכות ופיתוח", pct: 5, amt: 0 },
-            { name: "אישור אכלוס (טופס 4)", pct: 5, amt: 0 }
+            { name: "אישור אכלוס", pct: 5, amt: 0 }
         ];
 
         function init() {
-            const saved = localStorage.getItem('neighborData_v4');
+            const saved = localStorage.getItem('neighborData_v5');
             if (saved) {
                 const data = JSON.parse(saved);
                 document.getElementById('totalPrice').value = data.totalPrice;
@@ -130,86 +152,101 @@
 
         function addRowUI(data) {
             const container = document.getElementById('milestoneList');
-            const row = document.createElement('div');
-            row.className = 'milestone-card';
-            row.innerHTML = `
+            const card = document.createElement('div');
+            card.className = 'milestone-card';
+            card.innerHTML = `
                 <button class="del-btn" onclick="this.closest('.milestone-card').remove();updateAll()">✕</button>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3 pl-8">
-                    <input type="text" value="${data.name}" class="m-name font-bold border-none !p-0 focus:ring-0">
-                    <input type="date" value="${data.date || ''}" class="m-date text-sm font-bold text-blue-600 border border-slate-300 rounded p-1" oninput="updateAll()">
-                </div>
-                <div class="flex flex-wrap items-center gap-3 pr-2">
-                    <div class="flex items-center bg-slate-50 rounded-lg p-1 border border-slate-200">
-                        <span class="text-xs text-slate-400 px-1">%</span>
-                        <input type="number" value="${data.pct}" class="m-pct w-16 text-center font-bold bg-transparent border-none p-1" oninput="syncFromPct(this)">
-                    </div>
-                    <div class="flex items-center bg-slate-50 rounded-lg p-1 border border-slate-200 flex-grow">
-                        <span class="text-xs text-slate-400 px-1">₪</span>
-                        <input type="number" value="${data.amt}" class="m-amt font-bold bg-transparent border-none p-1" oninput="syncFromAmt(this)">
+                <div class="flex items-center gap-3 mb-2 pr-8">
+                    <div class="flex-grow flex items-center justify-between">
+                        <input type="text" value="${data.name}" class="m-name clean-input font-bold text-slate-700 flex-grow text-sm">
+                        <input type="date" value="${data.date || ''}" class="m-date date-input text-xs" oninput="updateAll()">
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-4 text-[11px]">
-                    <div class="text-slate-500">הצמדה ששולמה: <span class="m-link-paid font-bold text-slate-800 tracking-wide">₪0</span></div>
-                    <div class="text-left space-y-1">
+                <div class="flex items-center gap-6 mt-1 pr-8">
+                    <div class="flex items-center gap-0.5">
+                        <span class="text-[10px] text-slate-300 font-bold ml-1">%</span>
+                        <input type="number" value="${data.pct}" class="m-pct clean-input font-bold text-slate-400 w-12 text-center" oninput="syncFromPct(this)">
+                    </div>
+                    <div class="flex items-center gap-1 flex-grow">
+                        <span class="text-[10px] text-slate-300 font-bold ml-1">₪</span>
+                        <input type="number" value="${data.amt}" class="m-amt clean-input font-bold text-slate-800 w-full" oninput="syncFromAmt(this)">
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-between items-center text-[10px] pr-8 border-t border-slate-50 pt-2">
+                    <div class="text-slate-400 italic">הצמדה: <span class="m-link-paid font-bold text-slate-600">₪0</span></div>
+                    <div class="flex gap-4">
                         <div class="text-emerald-600 font-bold">החזר 60%: <span class="m-ref60">₪0</span></div>
-                        <div class="text-orange-600 font-bold">החזר איחור: <span class="m-refLate">₪0</span></div>
+                        <div class="text-orange-500 font-bold">החזר איחור: <span class="m-refLate">₪0</span></div>
                     </div>
                 </div>
             `;
-            container.appendChild(row);
+            container.appendChild(card);
         }
 
         function syncFromPct(el) {
             const total = parseFloat(document.getElementById('totalPrice').value) || 0;
-            const amtInput = el.closest('.milestone-card').querySelector('.m-amt');
-            amtInput.value = Math.round(total * (parseFloat(el.value) || 0) / 100);
+            const card = el.closest('.milestone-card');
+            const amtInput = card.querySelector('.m-amt');
+            if (amtInput) {
+                amtInput.value = Math.round(total * (parseFloat(el.value) || 0) / 100);
+            }
             updateAll();
         }
 
         function syncFromAmt(el) {
             const total = parseFloat(document.getElementById('totalPrice').value) || 0;
-            const pctInput = el.closest('.milestone-card').querySelector('.m-pct');
-            if (total > 0) pctInput.value = ((parseFloat(el.value) || 0) / total * 100).toFixed(2);
+            const card = el.closest('.milestone-card');
+            const pctInput = card.querySelector('.m-pct');
+            if (total > 0 && pctInput) {
+                pctInput.value = ((parseFloat(el.value) || 0) / total * 100).toFixed(2);
+            }
             updateAll();
         }
 
-        function updateAllPriceSync() {
+        function syncAllPrices() {
             const total = parseFloat(document.getElementById('totalPrice').value) || 0;
             document.querySelectorAll('.milestone-card').forEach(card => {
-                const pct = parseFloat(card.querySelector('.m-pct').value) || 0;
-                card.querySelector('.m-amt').value = Math.round(total * pct / 100);
+                const pctInput = card.querySelector('.m-pct');
+                const amtInput = card.querySelector('.m-amt');
+                if (pctInput && amtInput) {
+                    const pct = parseFloat(pctInput.value) || 0;
+                    // Don't sync the fixed 10k rows if they have 0% unless we manually change them
+                    if (pct > 0) {
+                        amtInput.value = Math.round(total * pct / 100);
+                    }
+                }
             });
             updateAll();
         }
 
         function addCustomRow() {
-            addRowUI({ name: "תשלום נוסף", pct: 0, amt: 0 });
+            addRowUI({ name: "תשלום מותאם", pct: 0, amt: 0 });
             updateAll();
         }
 
         function getIndex(dateStr) {
             if (!dateStr) return 0;
-            const [y, m] = dateStr.split('-');
-            const key = `${y}-${m}`;
+            const parts = dateStr.split('-');
+            const key = `${parts[0]}-${parts[1]}`;
             return indexData[key] || 0;
         }
 
         function updateAll() {
-            const signDate = document.getElementById('signDate').value;
-            const contractDeliv = document.getElementById('contractDelivery').value;
-            const actualDeliv = document.getElementById('actualDelivery').value;
+            const totalPrice = parseFloat(document.getElementById('totalPrice').value) || 0;
             const rent = parseFloat(document.getElementById('rent').value) || 0;
-            const total = parseFloat(document.getElementById('totalPrice').value) || 0;
+            const signDateVal = document.getElementById('signDate').value;
+            const contractDelivVal = document.getElementById('contractDelivery').value;
+            const actualDelivVal = document.getElementById('actualDelivery').value;
             
-            const isNewLaw = signDate && new Date(signDate) >= new Date('2022-07-07');
+            const isNewLaw = signDateVal && new Date(signDateVal) >= new Date('2022-07-07');
             const badge = document.getElementById('lawBadge');
             badge.innerText = isNewLaw ? "חוק המכר החדש (תיקון 9)" : "חוק המכר הישן";
-            badge.className = `mt-4 text-center py-2 rounded-xl text-xs font-bold ${isNewLaw ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-700'}`;
+            badge.className = `mt-6 text-center py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest ${isNewLaw ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400'}`;
 
-            // פיצוי שכ"ד
+            // Compensation
             let comp = 0;
-            if (contractDeliv && actualDeliv) {
-                const diffDays = (new Date(actualDeliv) - new Date(contractDeliv)) / (1000 * 60 * 60 * 24);
+            if (contractDelivVal && actualDelivVal) {
+                const diffDays = (new Date(actualDelivVal) - new Date(contractDelivVal)) / (1000 * 60 * 60 * 24);
                 const mTotal = diffDays / 30.44;
                 if (isNewLaw && diffDays > 30) {
                     for (let m = 2; m <= mTotal + 1; m++) {
@@ -222,50 +259,61 @@
                 }
             }
 
-            // החזרי הצמדה
+            // Linkage calculation
             let sum60 = 0, sumLate = 0;
-            const baseIdx = getIndex(signDate);
-            const delivIdx = getIndex(contractDeliv);
-            const currentList = [];
+            const baseIdx = getIndex(signDateVal);
+            const delivIdx = getIndex(contractDelivVal);
+            const listToSave = [];
 
             document.querySelectorAll('.milestone-card').forEach(card => {
-                const amt = parseFloat(card.querySelector('.m-amt').value) || 0;
-                const pDate = card.querySelector('.m-date').value;
+                const nameInput = card.querySelector('.m-name');
+                const pctInput = card.querySelector('.m-pct');
+                const amtInput = card.querySelector('.m-amt');
+                const dateInput = card.querySelector('.m-date');
+
+                if (!nameInput || !pctInput || !amtInput || !dateInput) return;
+
+                const amt = parseFloat(amtInput.value) || 0;
+                const pDate = dateInput.value;
                 const pIdx = getIndex(pDate);
                 
-                currentList.push({
-                    name: card.querySelector('.m-name').value,
-                    pct: card.querySelector('.m-pct').value,
+                listToSave.push({
+                    name: nameInput.value,
+                    pct: pctInput.value,
                     amt: amt,
                     date: pDate
                 });
 
+                const linkPaidEl = card.querySelector('.m-link-paid');
+                const ref60El = card.querySelector('.m-ref60');
+                const refLateEl = card.querySelector('.m-refLate');
+
                 if (amt > 0 && baseIdx > 0 && pIdx > 0) {
                     const totalLinkage = amt * (pIdx / baseIdx - 1);
-                    card.querySelector('.m-link-paid').innerText = '₪' + Math.max(0, Math.round(totalLinkage)).toLocaleString();
+                    if (linkPaidEl) linkPaidEl.innerText = '₪' + Math.max(0, Math.round(totalLinkage)).toLocaleString();
 
                     let r60 = 0, rLate = 0;
                     if (isNewLaw) {
-                        if (new Date(pDate) <= new Date(contractDeliv)) {
+                        if (new Date(pDate) <= new Date(contractDelivVal)) {
                             r60 = totalLinkage * 0.6;
                         } else {
                             const linkAtDeliv = amt * (delivIdx / baseIdx - 1);
                             r60 = linkAtDeliv * 0.6;
                             rLate = totalLinkage - linkAtDeliv;
                         }
-                    } else if (new Date(pDate) > new Date(contractDeliv)) {
+                    } else if (new Date(pDate) > new Date(contractDelivVal)) {
                         const linkAtDeliv = amt * (delivIdx / baseIdx - 1);
                         rLate = totalLinkage - linkAtDeliv;
                     }
 
-                    card.querySelector('.m-ref60').innerText = '₪' + Math.max(0, Math.round(r60)).toLocaleString();
-                    card.querySelector('.m-refLate').innerText = '₪' + Math.max(0, Math.round(rLate)).toLocaleString();
+                    if (ref60El) ref60El.innerText = '₪' + Math.max(0, Math.round(r60)).toLocaleString();
+                    if (refLateEl) refLateEl.innerText = '₪' + Math.max(0, Math.round(rLate)).toLocaleString();
                     sum60 += Math.max(0, r60);
                     sumLate += Math.max(0, rLate);
                 } else {
-                    card.querySelector('.m-link-paid').innerText = '₪0';
-                    card.querySelector('.m-ref60').innerText = '₪0';
-                    card.querySelector('.m-refLate').innerText = '₪0';
+                    if (linkPaidEl) linkPaidEl.innerText = '₪0';
+                    if (ref60El) ref60El.innerText = '₪0';
+                    if (refLateEl) refLateEl.innerText = '₪0';
                 }
             });
 
@@ -274,26 +322,26 @@
             document.getElementById('resLateTotal').innerText = '₪' + Math.round(sumLate).toLocaleString();
             document.getElementById('resTotal').innerText = '₪' + Math.round(comp + sum60 + sumLate).toLocaleString();
 
-            localStorage.setItem('neighborData_v4', JSON.stringify({
-                totalPrice: total, rent, signDate, contractDelivery: contractDeliv, actualDelivery: actualDeliv, milestones: currentList
+            localStorage.setItem('neighborData_v5', JSON.stringify({
+                totalPrice, rent, signDate: signDateVal, contractDelivery: contractDelivVal, actualDelivery: actualDelivVal, milestones: listToSave
             }));
         }
 
         function resetMilestones() {
             const total = parseFloat(document.getElementById('totalPrice').value) || 2500000;
             const list = defaultMilestones.map(m => {
-                let amt = m.amt;
-                if (m.deduct) amt = (total * m.pct / 100) - m.deduct;
-                else if (m.pct > 0) amt = total * m.pct / 100;
-                return { ...m, amt: Math.round(amt) };
+                let calculatedAmt = m.amt;
+                if (m.deduct) calculatedAmt = (total * m.pct / 100) - m.deduct;
+                else if (m.pct > 0) calculatedAmt = total * m.pct / 100;
+                return { ...m, amt: Math.round(calculatedAmt) };
             });
             renderMilestones(list);
             updateAll();
         }
 
         function shareWhatsApp() {
-            const msg = `*סיכום תביעת איחור במסירה*\n🏘️ פיצוי שכ"ד: ${document.getElementById('resComp').innerText}\n📉 החזר 60% מדד: ${document.getElementById('res60Total').innerText}\n🏗️ החזר מדד (איחור): ${document.getElementById('resLateTotal').innerText}\n*סה"כ דרישה: ${document.getElementById('resTotal').innerText}*`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+            const res = `*סיכום תביעת איחור במסירה*\n🏘️ פיצוי שכ"ד: ${document.getElementById('resComp').innerText}\n📉 החזר 60% מדד: ${document.getElementById('res60Total').innerText}\n🏗️ החזר מדד איחור: ${document.getElementById('resLateTotal').innerText}\n*סה"כ דרישה: ${document.getElementById('resTotal').innerText}*`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(res)}`);
         }
 
         init();

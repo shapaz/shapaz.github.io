@@ -32,7 +32,7 @@
 <body class="p-4 pb-72">
     <div class="max-w-2xl mx-auto">
         <header class="text-center mb-10">
-            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">מחשבון פיצוי שכנים</h1>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">מחשבון פיצוי דיירים</h1>
             <p class="text-slate-500 font-medium italic">בדיקת הצמדות ופיצוי איחור במסירה</p>
         </header>
 
@@ -40,8 +40,9 @@
         <div class="bg-white rounded-3xl shadow-sm p-6 mb-8 border border-slate-200">
             <div class="grid grid-cols-2 gap-4">
                 <div class="col-span-2">
-                    <label class="block text-xs font-bold text-slate-400 mb-1 mr-1">מחיר הדירה הכולל (₪)</label>
+                    <label class="block text-xs font-bold text-slate-400 mb-1 mr-1">מחיר הדירה הכולל + מע"מ (₪)</label>
                     <input type="number" id="totalPrice" value="2500000" oninput="syncAllPrices()" class="text-2xl font-black border-b-2 border-slate-100 focus:border-blue-500 outline-none w-full py-2 tracking-tight">
+                    <div class="text-[11px] text-slate-400 mt-1">לפני מע"מ: <span id="basePriceDisplay" class="font-bold text-slate-600">₪0</span></div>
                 </div>
                 <div class="col-span-2 sm:col-span-1">
                     <label class="block text-xs font-bold text-slate-400 mb-1 mr-1">שכירות חודשית (₪)</label>
@@ -106,14 +107,23 @@
     </div>
 
     <script>
+        // מדד מחירי תשומה בבנייה למגורים - בסיס 07/2011
+        // Source: CBS via https://www.dekel.co.il | new base (07/2025) converted using coeff 138.7/100
         const indexData = {
-            "2021-01": 115.1, "2021-02": 115.2, "2021-03": 115.7, "2021-04": 116.6, "2021-05": 117.5, "2021-06": 118.0, "2021-07": 118.5, "2021-08": 119.1, "2021-09": 119.2, "2021-10": 119.5, "2021-11": 119.7, "2021-12": 119.8,
-            "2022-01": 120.9, "2022-02": 121.4, "2022-03": 122.9, "2022-04": 124.4, "2022-05": 125.1, "2022-06": 126.0, "2022-07": 126.8, "2022-08": 127.4, "2022-09": 127.4, "2022-10": 127.8, "2022-11": 127.5, "2022-12": 127.5,
-            "2023-01": 128.8, "2023-02": 129.2, "2023-03": 129.2, "2023-04": 129.6, "2023-05": 130.1, "2023-06": 130.5, "2023-07": 130.5, "2023-08": 131.0, "2023-09": 131.0, "2023-10": 131.3, "2023-11": 131.4, "2023-12": 131.5,
-            "2024-01": 131.8, "2024-02": 132.0, "2024-03": 132.3, "2024-04": 133.0, "2024-05": 133.5, "2024-06": 133.6, "2024-07": 133.8, "2024-08": 134.1, "2024-09": 134.1, "2024-10": 134.2, "2024-11": 134.4, "2024-12": 134.6,
-            "2025-01": 134.9, "2025-02": 135.2, "2025-03": 135.5, "2025-04": 136.0, "2025-05": 136.4, "2025-06": 136.6, "2025-07": 136.8, "2025-08": 137.0, "2025-09": 137.2, "2025-10": 137.4, "2025-11": 137.6, "2025-12": 137.8,
-            "2026-01": 138.1, "2026-02": 138.4, "2026-03": 138.8, "2026-04": 139.1
+            "2021-01": 115.8, "2021-02": 116.0, "2021-03": 116.6, "2021-04": 117.5, "2021-05": 118.3, "2021-06": 119.0, "2021-07": 119.3, "2021-08": 120.0, "2021-09": 120.3, "2021-10": 120.6, "2021-11": 121.2, "2021-12": 121.5,
+            "2022-01": 122.5, "2022-02": 123.1, "2022-03": 124.3, "2022-04": 125.5, "2022-05": 126.1, "2022-06": 126.8, "2022-07": 127.4, "2022-08": 127.5, "2022-09": 127.5, "2022-10": 127.5, "2022-11": 127.3, "2022-12": 127.3,
+            "2023-01": 128.8, "2023-02": 128.6, "2023-03": 128.9, "2023-04": 129.3, "2023-05": 129.2, "2023-06": 129.6, "2023-07": 129.3, "2023-08": 129.4, "2023-09": 129.5, "2023-10": 129.7, "2023-11": 129.8, "2023-12": 129.8,
+            "2024-01": 130.2, "2024-02": 129.9, "2024-03": 130.2, "2024-04": 130.1, "2024-05": 130.7, "2024-06": 131.2, "2024-07": 131.7, "2024-08": 132.0, "2024-09": 132.5, "2024-10": 132.8, "2024-11": 133.2, "2024-12": 133.6,
+            "2025-01": 137.1, "2025-02": 137.7, "2025-03": 138.2, "2025-04": 138.4, "2025-05": 138.6, "2025-06": 138.6, "2025-07": 138.7, "2025-08": 139.3, "2025-09": 139.3, "2025-10": 139.4, "2025-11": 140.2, "2025-12": 140.4,
+            "2026-01": 140.5, "2026-02": 140.8, "2026-03": 141.1, "2026-04": 142.6, "2026-05": 143.4, "2026-06": 143.7
         };
+
+        // VAT rates by date range
+        function getVatRate(dateStr) {
+            if (!dateStr) return 0.17;
+            if (dateStr >= '2025-01-01') return 0.18;
+            return 0.17;
+        }
 
         const defaultMilestones = [
             { name: "מקדמה", pct: 0, amt: 10000 },
@@ -170,10 +180,14 @@
                     <div class="flex items-center gap-1 flex-grow">
                         <span class="text-[10px] text-slate-300 font-bold ml-1">₪</span>
                         <input type="number" value="${data.amt}" class="m-amt clean-input font-bold text-slate-800 w-full" oninput="syncFromAmt(this)">
+                        <span class="text-[9px] text-slate-300 whitespace-nowrap">ללא מע"מ</span>
                     </div>
                 </div>
                 <div class="mt-4 flex justify-between items-center text-[10px] pr-8 border-t border-slate-50 pt-2">
-                    <div class="text-slate-400 italic">הצמדה: <span class="m-link-paid font-bold text-slate-600">₪0</span></div>
+                    <div class="flex gap-3">
+                        <div class="text-purple-500">מע"מ: <span class="m-vat font-bold">₪0</span></div>
+                        <div class="text-slate-400 italic">הצמדה: <span class="m-link-paid font-bold text-slate-600">₪0</span></div>
+                    </div>
                     <div class="flex gap-4">
                         <div class="text-emerald-600 font-bold">החזר 60%: <span class="m-ref60">₪0</span></div>
                         <div class="text-orange-500 font-bold">החזר איחור: <span class="m-refLate">₪0</span></div>
@@ -181,38 +195,49 @@
                 </div>
             `;
             container.appendChild(card);
+            if (data.fixed) card.setAttribute('data-fixed', '1');
+        }
+
+        // Get base price (without VAT) using VAT rate at sign date
+        function getBasePrice() {
+            const totalPrice = parseFloat(document.getElementById('totalPrice').value) || 0;
+            const signDateVal = document.getElementById('signDate').value;
+            const vatRate = getVatRate(signDateVal);
+            return totalPrice / (1 + vatRate);
         }
 
         function syncFromPct(el) {
-            const total = parseFloat(document.getElementById('totalPrice').value) || 0;
+            const basePrice = getBasePrice();
             const card = el.closest('.milestone-card');
             const amtInput = card.querySelector('.m-amt');
             if (amtInput) {
-                amtInput.value = Math.round(total * (parseFloat(el.value) || 0) / 100);
+                amtInput.value = Math.round(basePrice * (parseFloat(el.value) || 0) / 100);
             }
+            card.removeAttribute('data-fixed');
             updateAll();
         }
 
         function syncFromAmt(el) {
-            const total = parseFloat(document.getElementById('totalPrice').value) || 0;
+            const basePrice = getBasePrice();
             const card = el.closest('.milestone-card');
             const pctInput = card.querySelector('.m-pct');
-            if (total > 0 && pctInput) {
-                pctInput.value = ((parseFloat(el.value) || 0) / total * 100).toFixed(2);
+            if (basePrice > 0 && pctInput) {
+                pctInput.value = ((parseFloat(el.value) || 0) / basePrice * 100).toFixed(2);
             }
+            card.setAttribute('data-fixed', '1');
             updateAll();
         }
 
         function syncAllPrices() {
-            const total = parseFloat(document.getElementById('totalPrice').value) || 0;
+            const basePrice = getBasePrice();
             document.querySelectorAll('.milestone-card').forEach(card => {
+                if (card.hasAttribute('data-fixed')) return;
                 const pctInput = card.querySelector('.m-pct');
                 const amtInput = card.querySelector('.m-amt');
                 if (pctInput && amtInput) {
                     const pct = parseFloat(pctInput.value) || 0;
-                    // Don't sync the fixed 10k rows if they have 0% unless we manually change them
                     if (pct > 0) {
-                        amtInput.value = Math.round(total * pct / 100);
+                        amtInput.value = Math.round(basePrice * pct / 100);
                     }
                 }
             });
@@ -229,10 +254,24 @@
             const parts = dateStr.split('-');
             const key = `${parts[0]}-${parts[1]}`;
             if (indexData[key]) return indexData[key];
-            // Fallback: use nearest known index value
             const keys = Object.keys(indexData).sort();
             if (key < keys[0]) return indexData[keys[0]];
-            if (key > keys[keys.length - 1]) return indexData[keys[keys.length - 1]];
+            if (key > keys[keys.length - 1]) {
+                // Extrapolate: compute 12-month growth rate from last known data
+                const lastKey = keys[keys.length - 1];
+                const lastVal = indexData[lastKey];
+                // Find the value 12 months before the last key
+                const [ly, lm] = lastKey.split('-').map(Number);
+                const prevYear = ly - 1;
+                const prevKey = `${prevYear}-${String(lm).padStart(2, '0')}`;
+                const prevVal = indexData[prevKey];
+                if (!prevVal) return lastVal;
+                const annualRate = lastVal / prevVal;
+                // Calculate months forward from last known
+                const [ty, tm] = key.split('-').map(Number);
+                const monthsForward = (ty - ly) * 12 + (tm - lm);
+                return lastVal * Math.pow(annualRate, monthsForward / 12);
+            }
             return 0;
         }
 
@@ -242,6 +281,10 @@
             const signDateVal = document.getElementById('signDate').value;
             const contractDelivVal = document.getElementById('contractDelivery').value;
             const actualDelivVal = document.getElementById('actualDelivery').value;
+
+            // Display base price
+            const basePrice = getBasePrice();
+            document.getElementById('basePriceDisplay').innerText = '₪' + Math.round(basePrice).toLocaleString();
             
             const isNewLaw = signDateVal && new Date(signDateVal) >= new Date('2022-07-07');
             const badge = document.getElementById('lawBadge');
@@ -278,23 +321,33 @@
 
                 if (!nameInput || !pctInput || !amtInput || !dateInput) return;
 
-                const amt = parseFloat(amtInput.value) || 0;
+                const preVatAmt = parseFloat(amtInput.value) || 0;
                 const pDate = dateInput.value;
                 const pIdx = getIndex(pDate);
-                
+
+                // Compute VAT for this payment based on payment date
+                const vatRate = getVatRate(pDate);
+                const vatAmt = preVatAmt * vatRate;
+                const fullAmt = preVatAmt + vatAmt;
+
                 listToSave.push({
                     name: nameInput.value,
                     pct: pctInput.value,
-                    amt: amt,
-                    date: pDate
+                    amt: preVatAmt,
+                    date: pDate,
+                    fixed: card.hasAttribute('data-fixed') ? 1 : 0
                 });
 
+                const vatEl = card.querySelector('.m-vat');
                 const linkPaidEl = card.querySelector('.m-link-paid');
                 const ref60El = card.querySelector('.m-ref60');
                 const refLateEl = card.querySelector('.m-refLate');
 
-                if (amt > 0 && baseIdx > 0 && pIdx > 0) {
-                    const totalLinkage = amt * (pIdx / baseIdx - 1);
+                // Display VAT
+                if (vatEl) vatEl.innerText = preVatAmt > 0 && pDate ? '₪' + Math.round(vatAmt).toLocaleString() : '₪0';
+
+                if (fullAmt > 0 && baseIdx > 0 && pIdx > 0) {
+                    const totalLinkage = fullAmt * (pIdx / baseIdx - 1);
                     if (linkPaidEl) linkPaidEl.innerText = '₪' + Math.max(0, Math.round(totalLinkage)).toLocaleString();
 
                     let r60 = 0, rLate = 0;
@@ -302,12 +355,12 @@
                         if (new Date(pDate) <= new Date(contractDelivVal)) {
                             r60 = totalLinkage * 0.6;
                         } else {
-                            const linkAtDeliv = amt * (delivIdx / baseIdx - 1);
+                            const linkAtDeliv = fullAmt * (delivIdx / baseIdx - 1);
                             r60 = linkAtDeliv * 0.6;
                             rLate = totalLinkage - linkAtDeliv;
                         }
                     } else if (new Date(pDate) > new Date(contractDelivVal)) {
-                        const linkAtDeliv = amt * (delivIdx / baseIdx - 1);
+                        const linkAtDeliv = fullAmt * (delivIdx / baseIdx - 1);
                         rLate = totalLinkage - linkAtDeliv;
                     }
 
@@ -333,11 +386,11 @@
         }
 
         function resetMilestones() {
-            const total = parseFloat(document.getElementById('totalPrice').value) || 2500000;
+            const basePrice = getBasePrice();
             const list = defaultMilestones.map(m => {
                 let calculatedAmt = m.amt;
-                if (m.deduct) calculatedAmt = (total * m.pct / 100) - m.deduct;
-                else if (m.pct > 0) calculatedAmt = total * m.pct / 100;
+                if (m.deduct) calculatedAmt = (basePrice * m.pct / 100) - m.deduct;
+                else if (m.pct > 0) calculatedAmt = basePrice * m.pct / 100;
                 return { ...m, amt: Math.round(calculatedAmt) };
             });
             renderMilestones(list);
